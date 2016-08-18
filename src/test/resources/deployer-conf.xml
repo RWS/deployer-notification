@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><Deployer xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="8.2" xsi:noNamespaceSchemaLocation="../schemas/deployer-conf.xsd">
+    <Processors>
+        <Processor Action="Deploy" Class="com.tridion.deployer.Processor">
+            <Module Class="com.tridion.deployer.modules.SchemaDeploy" Type="SchemaDeploy"/>
+            <Module Class="com.tridion.deployer.modules.PageDeploy" Type="PageDeploy">
+                <Transformer Class="com.tridion.deployer.TCDLTransformer"/>
+            </Module>
+            <Module Class="com.tridion.deployer.modules.BinaryDeploy" Type="BinaryDeploy"/>
+            <Module Class="com.tridion.deployer.modules.ComponentDeploy" Type="ComponentDeploy"/>
+            <Module Class="com.tridion.deployer.modules.TemplateDeploy" Type="TemplateDeploy"/>
+            <Module Class="com.tridion.deployer.modules.PublicationDeploy" Type="PublicationDeploy"/>
+            <Module Class="com.tridion.deployer.modules.TaxonomyDeploy" Type="TaxonomyDeploy"/>
+            <Module Class="com.tridion.deployer.modules.ComponentPresentationDeploy" Type="ComponentPresentationDeploy">
+                <Transformer Class="com.tridion.deployer.TCDLTransformer"/>
+            </Module>
+            <Module Class="com.tridion.deployer.modules.StructureGroupDeploy" Type="StructureGroupDeploy"/>
+        </Processor>
+
+        <Processor Action="Deploy" Class="com.tridion.deployer.Processor" Phase="post-transaction">
+            <Module Class="com.sdl.deployer.notification.NotificationModule" Type="NotificationHook">
+                <Conditions>
+                    <!-- Multiple condition blocks can be specified, each can trigger a notification -->
+                    <AndCondition>
+                        <ItemTypeCondition ItemType="64"/>
+                        <PublicationCondition PublicationId="1"/>
+                        <TaxonomyCondition TaxonomyId="10"/>
+
+                        <!-- You can select which notifiers to use -->
+                        <Notifiers>
+                            <Notifier Id="MailNotifier">
+                                <!-- Template can be overridden for specific condition sets -->
+                                <Property Name="template" Value="Taxonomy Item with title: '${title}' and itemId ${id} was published to publication: ${publicationId} on: ${lastPublicationDate}"/>
+                                <Property Name="subjectTemplate" Value="Taxonomy Item ${title} with id ${id} published"/>
+                            </Notifier>
+                            <Notifier Id="HipChatNotifier"/>
+                        </Notifiers>
+                    </AndCondition>
+                    <AndCondition>
+                        <!-- all these conditions will use the default notifiers -->
+                        <ItemTypeCondition ItemType="16"/>
+                        <SchemaCondition SchemaId="555"/>
+                    </AndCondition>
+                </Conditions>
+                <Notifiers>
+                    <Notifier Id="MailNotifier">
+                        <Property Name="mail.smtp.auth" Value="false"/>
+                        <Property Name="mail.smtp.host" Value="smpt-host"/>
+                        <Property Name="mail.from" Value="noreply@mydomain.com"/>
+                        <Property Name="mail.to" Value="notifier@mydomain.com"/>
+                        <Property Name="subjectTemplate" Value="Item ${title} with id ${id} published"/>
+                        <Property Name="template" Value="Item with title: '${title}' and itemId ${id} was published in publication: ${publicationId} on: ${lastPublicationDate}"/>
+
+                        <!--<Property Name="mail.smtp.starttls.enable" Value=""/>-->
+                        <!--<Property Name="mail.smtp.port" Value=""/>-->
+                        <!--<Property Name="mail.smtp.user" Value=""/>-->
+                        <!--<Property Name="mail.smtp.password" Value=""/>-->
+                    </Notifier>
+                    <Notifier Id="HipChatNotifier">
+                        <Property Name="token" Value="roomToken"/>
+                        <Property Name="room" Value="notification-room"/>
+                        <Property Name="template" Value="Item with title: '${title}' and itemId ${id} was published in publication: ${publicationId} on: ${lastPublicationDate}"/>
+                    </Notifier>
+                </Notifiers>
+            </Module>
+        </Processor>
+
+        <Processor Action="Undeploy" Class="com.tridion.deployer.Processor">
+            <Module Class="com.tridion.deployer.modules.PageUndeploy" Type="PageUndeploy"/>
+            <Module Class="com.tridion.deployer.modules.ComponentPresentationUndeploy" Type="ComponentPresentationUndeploy"/>
+            <Module Class="com.tridion.deployer.modules.TaxonomyUndeploy" Type="TaxonomyUndeploy"/>
+            <Module Class="com.tridion.deployer.modules.StructureGroupUndeploy" Type="StructureGroupUndeploy"/>
+        </Processor>
+    </Processors>
+
+    <Queue>
+        <Location Path="/Users/rdevries/tridion/deployer/incoming" WindowSize="20" Workers="10" Cleanup="true" Interval="2s"/>
+        <Location Path="/Users/rdevries/tridion/deployer/incoming/http" WindowSize="10" Workers="10" Cleanup="true" Interval="2s"/>
+    </Queue>
+    <HTTPSReceiver MaxSize="10000000" Location="/Users/rdevries/tridion/deployer/incoming" InProcessDeploy="true"/>
+    <!--
+     Specifies the location of the license file.
+     -->
+    <!--
+    <License Location="c:\SDLWeb\cd_licenses.xml"/>
+    -->
+    <TCDLEngine>
+        <Properties>
+            <Property Name="tcdl.dotnet.style" Value="controls"/>
+            <Property Name="tcdl.jsp.style" Value="tags"/>
+            <Property Name="tcdl.target.language" Value="rel" />
+        </Properties>
+        <!-- Optional configuration needed in case of using the UGC TCDL transformers -->
+        <!--
+        <TagBundle Resource="ugc_tag_bundle.xml"/>
+        -->
+    </TCDLEngine>
+    <!-- Specify RMI listening port, if necessary  -->
+    <!-- <RMIChannel ListenerPort="1050"/> -->
+</Deployer>

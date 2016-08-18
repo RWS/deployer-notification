@@ -1,0 +1,2 @@
+com.sdl.deployer.notification.hipchat.HipchatNotifier
+com.sdl.deployer.notification.email.MailNotifier
