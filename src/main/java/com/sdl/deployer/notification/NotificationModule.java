@@ -1,3 +1,18 @@
+/**
+ * Copyright (c) 2016 All Rights Reserved by the SDL Group.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.sdl.deployer.notification;
 
 import com.sdl.deployer.notification.conditions.RootCondition;
@@ -32,6 +47,10 @@ public class NotificationModule extends Module {
         super(configuration, processor);
     }
 
+    public NotificationModule(Configuration configuration) throws ConfigurationException {
+        super(configuration, null);
+    }
+
     @Override
     public void configure(Configuration configuration) throws ConfigurationException {
         super.configure(configuration);
@@ -42,6 +61,7 @@ public class NotificationModule extends Module {
 
     @Override
     public void process(TransportPackage data) throws ProcessingException {
+        LOG.info("Checking conditions for items in package: {}", data.getTransactionId());
         if(!rootConditions.isEmpty()) {
             processItemType(data, PAGE_TYPE);
             processItemType(data, COMPONENT_TYPE);
