@@ -1,3 +1,4 @@
+# SDL Web Deployer Notification Module [![Build Status](https://travis-ci.org/sdl/deployer-notification.svg?branch=master)](https://travis-ci.org/sdl/deployer-notification) 
 This SDL Web Deployer Notification module allows you to send notifications to different channels after a set of content conditions are met. The conditions can be applied to any content items that are published to your delivery environment. For example this extension allows you to send a notification after a content item associated to a certain taxonomy has been published.
 
 *The plugin is build targeting Web 8.1.1 or above, once the plugin is built it most likely will work with any 8.x version of SDL Web.*
